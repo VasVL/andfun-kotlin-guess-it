@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -59,18 +60,20 @@ class GameFragment : Fragment() {
         }
 
         /** Setting up LiveData observation relationship **/
-        viewModel.word.observe(this, Observer { newWord ->
+        viewModel.word.observe(viewLifecycleOwner, Observer { newWord ->
             binding.wordText.text = newWord
         })
 
-        viewModel.score.observe(this, Observer { newScore ->
+        viewModel.score.observe(viewLifecycleOwner, Observer { newScore ->
             binding.scoreText.text = newScore.toString()
         })
 
-        // TODO (04) Add an observer of eventGameFinish which, when eventGameFinish is true,
-        // performs the code in gameFinished()
-        // Make sure to call onGameFinishCompete to tell your viewmodel that the game finish event
-        // was dealt with
+        viewModel.eventGameFinish.observe(viewLifecycleOwner, Observer { hasFinished ->
+            if(hasFinished) {
+                gameFinished()
+                viewModel.onGameFinishComplete()
+            }
+        })
 
         return binding.root
 
